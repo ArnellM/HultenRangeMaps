@@ -26,3 +26,7 @@ Imports:
     terra,
     tidyr,
     utils
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

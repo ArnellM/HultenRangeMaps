@@ -7,7 +7,7 @@
 #' @returns a polygon feature (SpatVector)
 #' @export
 #'
-#' @examples
+
 mapCleanConvert <- function(x){
   border_remove <- sf::as_Spatial(border_remove)
   ras_crop <- raster::crop(x, raster::extent(border_remove)) # crop raster to the extent of the polygon

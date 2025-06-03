@@ -2,7 +2,7 @@
 title: "HultenRangeMaps"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{HultenRangeMaps-vignette}
+  %\VignetteIndexEntry{HultenRangeMaps}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,13 +19,15 @@ library(HultenRangeMaps)
 ```
 
 ## Introduction
-This package contains the methods employed to digitise the historical range maps in the 'Atlas of the distribution of vascular plants in northwestern Europe' (Hultén 1971).Methods include georeferencing the scanned maps, extract range data, clean data and convert data from raster to spatial feature (polygon) data.  
+This package contains the methods employed to digitise the historical range maps in the 'Atlas of the distribution of vascular plants in northwestern Europe' (Hultén 1971). Methods include georeferencing the scanned maps, extract range data, clean data and convert data from raster to spatial feature (polygon) data.  
 <br>
 To aid spatial analyses of our data, we also provide an example on how to match the digitized distribution maps to the Swedish 10×10 km National grid.  
 <br>
 The dataset contains 1926 georeferenced and digitized historical distribution maps of vascular plants.The original maps have an effective resolution of 16×16 km and cover Scandinavia and Finland as well as parts of the Baltic countries, Germany and Russia.  
 <br>
 A detailed description of how the original atlas was compiled as well as the method used to georeference and digitize the distribution maps can be found in Arnell et al. (xxxx). The dataset can be found at XXXX.  
+<br>
+To insure reproducability, we have created a 'mini' repository with all the packages that the functions in HultenRangeMaps require. The repository can be downloaded [here](from )https://github.com/ArnellM/HultenRangeMaps_miniCRAN_June2025.git). In the end of this document is a short guide on how to install packages from local repositories.  
 <br>
 When using these data, please cite both the dataset (Arnell et al. XXXa) and the accompanying data paper (Arnell et al. XXXb).  
 <br>
@@ -42,7 +44,7 @@ Georeferencing is the process of assigning coordinates of a known coordinate ref
 In this project we choose 16 GCPs at the longitudes and latitudes marked on the scanned maps (Figure 6 in Arnell et al XXX). These 16 points were complemented with 4 GCPs in areas where locations on the printed map deviated from the actual locations (the coast of Norway and Denmark and the island of Gotland). The manual georeferencing was performed in QGIS (QGIS Development Team 2022).  
 <br>
 
-```{r,out.width="50%"}
+```{r,out.width="100%", dpi=600}
 # ground control points
 gcps <- matrix(c(127.095, 54.15, 0, 70,
                  566.228, 149.247, 10, 70,
@@ -63,7 +65,7 @@ gcps <- matrix(c(127.095, 54.15, 0, 70,
                ncol = 4, byrow = TRUE) # the gcps are retrived from the Qgis gdal script, minus the first "-gcp". 
 
 # since the gdal functions require a file path, generate a temporary directory
-temp <- base::tempdir()
+temp <- tempdir()
 
 # save the aligned example map in the temporary directory
 jpeg::writeJPEG(aligned_map,paste0(temp,"/aligned_map.jpg"))
@@ -79,14 +81,14 @@ raster::plotRGB(ref_map) # plot map
 <br>  
 
 ## Digitise scanned and aligned range maps  
-The maps were printed in only two colors (see the map above and Figure 1-7 in Arnell et al. XXX) with distribution areas represented in red and geographical borders represented in green. We can therefore extract the range data from the georeferenced raster images by extracting the red pixel values (Figure 8 et al. XXX).  
+The maps were printed in only two colors (see the map above and Figure 1-7 in Arnell et al. XXX) with distribution areas represented in dark red and geographical borders represented in green. We can therefore extract the range data from the georeferenced raster images by extracting the red pixel values (Figure 8 et al. XXX).  
 <br>  
-The function mapDig() takes a scanned range map (raster stack) with three bands (Red-Green-Blue) and extracts the range information by taking the green raster band and setting all pixel values up to 150 to 1 and all other to 0. The pixel range 0-150 in green raster band represents the dark red areas in the scanned map.  
+The function mapDig() takes a scanned range map (raster stack) with three bands (Red-Green-Blue) and extracts the range information by taking the green raster band and setting pixel values 1-150 to 1 and all other to 0. The pixel range 0-150 in green raster band represents the dark red areas in the scanned map.  
 <br>  
 
-```{r,out.width="50%"}
+```{r, out.width="50%"}
 dig_map <- mapDig(ref_map) # digitise the georeferenced map
-raster::plot(dig_map, col="black",legend = FALSE) # plot map
+raster::plot(dig_map, col="black",legend=F) # plot map
 ```
 
 ## Automated data cleaning and conversion from raster to spatial features
@@ -101,51 +103,56 @@ clean_map <- mapCleanConvert(dig_map)
 raster::plot(clean_map, col="black")
 ```
 
-<br>
+<br>  
+
 ## Manual data cleaning and updated scientific nomenclature
 The cleaned map still contains digitization errors (parts of map border), as well as map symbols that represent non-presence points, e.g. locally extinct populations (open circle) and fossil records (crosses). These have been manually removed from the maps in the database. Please refer to the description in Arnell et al. XXX and the file HULTEN_DataDescription.txt in the data base (Arnell et al. XXX) for information on manual editing as well as updated scientific nomenclature.  
 <br>
 
 ## Example: how to match the digitized distribution maps to the Swedish National grid 
-To aid spatial analyses of our data, we provide an example on how to match the digitized distribution maps to the Swedish 10×10 km National grid, commonly employed in Swedish regional plant inventories. The outcome is a text file with historical presence per grid cell per species.
+To aid spatial analyses of our data, we provide an example on how to match the digitized distribution maps to the Swedish 10×10 km National grid, commonly employed in Swedish regional plant inventories. The outcome is a list of data frames with historical presence per grid cell per species.
 <br>  
 
 There are two main types of symbols representing a species' range in the original maps. Hatched areas representing areas where the species is common to less common and dots representing isolated finds (Figure 3 in Arnell et al. XXX). Given the scale of the original maps, the size of the dots representing isolated finds is approximately 16 km on the ground. This means that if we overlap the digitized and cleaned range maps (polygon features) with the 10×10 km Swedish National grid one 'isolated find' polygon will commonly overlap with 4-6 10×10 km grid cells, thus potentially over representing the historical range of a species. We overcome this by identifying 'isolated finds' polygons (features with circular shapes and of the right size) and reduce the area of these polygons by a 5000 m negative buffer.    
-<br>
-
-The function rangeToSweNationalGrid() performs the steps described above. The function is designed to take a file path to the directory where the database (XXX) is stored. In this example we save an example database map of *Lycopodium alpinum* in a temporary directory.  
 <br>  
 
-```{r,results='hide',message=FALSE}
+The function rangeToGrid() performs the steps described above. The function is designed to take a file path to the directory where the database (XXX) is stored. In this example we save an example database map of *Lycopodium alpinum* in a temporary directory.  
+<br>  
 
+**NOTE:** for the function to work the grid needs to be a polygon spatial feature with gridIDs stored in an attribute column named 'gridID'  
+<br>
+
+```{r,results='hide',message=T}
 # save the example database map in the temporary directory
 geojsonio::geojson_write(database_map, file = paste0(temp,"\\Lycopodium alpinum_0001.geojson"))
 
-# for the function to work the grid needs to have only two attribute columns: 1 id column and 1 column with names of the grid cells 
-
-# when we retrieve maps from a temporary directory, we need to add '\\' to the file path. This is not necessary if you have stored the database (XXX) in a folder on your computer
-list_histRange <- rangeToSweNationalGrid(paste0(temp,"\\"))
+# when we retrieve maps from a temporary directory, we need to add '/' to the file path. This is not necessary if you have stored the database (XXX) in a folder on your computer
+list_histRange <- rangeToGrid(paste0(temp,"/"))
 
 # combine data frames (in this example there is only one)
 hist_pres <- do.call(rbind, list_histRange)
 rownames(hist_pres) <- NULL
 ```
+  
+<br>  
+  
 ```{r}
-utils::head(hist_pres)
+# historical presence per species per grid
+head(hist_pres)
 ```
 <br>
 
 ## Historical biodiversity of vascular plants in Sweden
-In the example above we match the historical distribution area of one species to the Swedish national grid. Included in the database (and in this package) is a file with per grid historical presence of all species in the database 'histPresSweNationalGrid.csv' produced using the method above. This can be used to produce a map of the Historical biodiversity of vascular plants in Sweden.  
+In the example above we match the historical distribution area of one species to the Swedish national grid. Included in the database (and in this package) is a file 'histPresSweNationalGrid.csv' with per grid historical presence of all species in the database produced using the method above. This can be used to produce a map of the Historical biodiversity of vascular plants in Sweden.  
 <br>
-For this purpose we exclude grid cells with 50% or more land surface outside Sweden’s national borders and grid cells covered to 80% or more by sea surface or waterways.  
+We exclude grid cells with 50% or more land surface outside Sweden’s national borders and grid cells covered to 80% or more by sea surface or waterways.  
 <br>
 ```{r,out.width="50%"}
 # the Swedish national grids with enough land surface
 landGridsMap <- SweNationalGrid[SweNationalGrid$gridID %in% land_grids,]
 
 # count number of species per grid
-hist_biodiv <- stats::setNames(stats::aggregate(histPres ~ gridID, histPresSweNationalGrid, sum),c("gridID", "histBiodiv"))
+hist_biodiv <- setNames(aggregate(histPres ~ gridID, histPresSweNationalGrid, sum),c("gridID", "histBiodiv"))
 
 # add historical biodiversity data to map
 histBiodivMap <- merge(landGridsMap, hist_biodiv)
@@ -153,37 +160,65 @@ histBiodivMap <- merge(landGridsMap, hist_biodiv)
 #plot!
 plot(histBiodivMap["histBiodiv"], border=NA, main="" )
 ```
-## Another example: match the digitized distribution maps to the European 10x10 grid in Scandinavia
+<br>
+
+## Bonus example: match the digitized distribution maps to the European 10x10 grid in Scandinavia
+To illustrate that the function can match the historical range data to any grid data (as long as the grid is a polygon spatial feature with one attribute column named 'gridID'), we have included another example. Included in this package is a list of files with the historical ranges of the Scandinavian *Galium* species (N=14) from the database as well as the part of the European 10x10 that covers Scandinavia and Finland.  
+<br>  
+
+In this example we store the *Galium* historical range maps in a temporary folder, match their distributions to the European grid and plot the number of *Galium* species per grid in Scandinavia.  
+<br>
+
+
 ```{r,out.width="50%",results='hide',message=FALSE}
-
-# new temporary directory
-#temp <- base::tempdir()
-
-# add Galuim species ranges in the temprary folder
-#for (i in names(galium_list)){
-#  write_sf(galium_list[[i]],paste0(temp,"\\",i))
-#}
-
+# add Galuim species ranges to the temporary folder
+for (i in names(galium_list)){
+  sf::write_sf(galium_list[[i]],paste0(temp,"\\",i))
+}
 
 # match historical distributions of Galium species to the European grid (this will take some time since there are 14 Galium species in the database)
-#list_histRangeScan <- rangeToSweNationalGrid(paste0(temp,"\\"),pattern="*Galium*", grid = EUgridScandinavia)
+list_histRangeScan <- rangeToGrid(paste0(temp,"/"),pattern="*Galium*", grid = ScanGrid)
 
 # combine data frames
-#hist_pres_scan <- do.call(rbind, list_histRangeScan)
-#rownames(hist_pres_scan) <- NULL
+hist_pres_scan <- do.call(rbind, list_histRangeScan)
+rownames(hist_pres_scan) <- NULL
 
 ```
 
 ```{r,out.width="50%",results='hide',message=FALSE}
 # count number of species per grid
-#hist_biodiv_scan <- stats::setNames(stats::aggregate(histPres ~ gridID, hist_pres_scan, sum),c("gridID", "histBiodiv"))
+hist_Galium_biodiv_scan <- setNames(aggregate(histPres ~ gridID, hist_pres_scan, sum),c("gridID", "histBiodiv"))
 
-# add historical biodiversity data to map (this will also take some time...)
-#histBiodivScan <- merge(EUgridScandinavia, hist_biodiv_scan)
+# add historical biodiversity data to map
+histGaliumBiodivScan <- merge(ScanGrid, hist_Galium_biodiv_scan, all.x=T)
 
 #plot!
-#plot(histBiodivScan["histBiodiv"], border=NA, main="")
+plot(histGaliumBiodivScan["histBiodiv"], border=NA, main="")
 ```
+
+<br>
+
+## *Guide:* how to install packages from local repositories
+To insure reproducability, we have created a 'miniCRAN' repository with all the packages that the functions in HultenRangeMaps require (and the packages that they in turn require). The repository can be downloaded [here](from )https://github.com/ArnellM/HultenRangeMaps_miniCRAN_June2025.git).  
+<br>
+First, download the repository to your computer. Then, install the packages from your local repository using the code below.  
+<br>
+
+```{r}
+# list of packages that the functions in HultenRangeMaps require
+pkgs <- c("dplyr", "gdalUtilities", "geojsonio", "gtools", "igraph", "jpeg", "raster", "sf", "terra", "tidyr")
+
+# path to where you have downloaded the local miniCran repository
+pth <- "C:/miniCran/HultenRangeMaps_miniCRAN_June2025"
+
+# Install packages from your local miniCRAN repository
+install.packages(pkgs, 
+                 repos = paste0("file:///", pth),
+                 type = "source")
+
+```
+
+<br>
 
 ## References
 Arnell et al. (XXXa)  
