@@ -18,15 +18,13 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-This package contains the methods employed to digitise the historical range maps in the ‘Atlas of the distribution of vascular plants in northwestern Europe’ (Hultén 1971). Methods include georeferencing the scanned maps, extract range data, clean data and convert data from raster to spatial feature (polygon) data. A detailed description of how the original atlas was compiled as well as the method used to georeference and digitize the distribution maps can be found in Arnell et al. (xxxx). The dataset can be found [here](https://researchdata.se/en/catalogue/dataset/2025-151/1?previewToken=6298dade-fc8b-4ba2-b553-fba50963b476).
-<br>
-The package contains two functions to extract and clean distribution data from the scanned maps, one function to modify file names and one function to match the distribution data to polygon grids commonly used when analysing historical atlas data. 
+This package contains the methods employed to digitise the historical range maps in the ‘Atlas of the distribution of vascular plants in northwestern Europe’ (Hultén 1971). Methods include georeferencing the scanned maps, extract range data, clean data and convert data from raster to spatial feature (polygon) data. A detailed description of how the original atlas was compiled as well as the method used to georeference and digitize the distribution maps can be found in Arnell et al. (xxxx). The dataset can be found [here](https://researchdata.se/en/catalogue/dataset/2025-151/1?previewToken=6298dade-fc8b-4ba2-b553-fba50963b476). The package contains two functions to extract and clean distribution data from the scanned maps, one function to modify file names and one function to match the distribution data to polygon grids commonly used when analysing historical atlas data. 
 
 ## Installation
 
-This package can be installed from [GitHub](https://github.com/) using the devtools package. To insure reproducability, we have created a 'mini' repository with all the packages that the functions in HultenRangeMaps require. The repository can be downloaded [here](https://github.com/ArnellM/HultenRangeMaps_miniCRAN_June2025.git). First, download the repository to your computer. Then, install the packages from your local repository using the code below.  
+This package can be using the devtools package. To insure reproducability, we have created a 'mini' repository with all the packages that the functions in HultenRangeMaps require. The repository can be downloaded [here](https://github.com/ArnellM/HultenRangeMaps_miniCRAN_June2025.git). First, download the repository to your computer. Then, install the packages from your local repository using the code below.  
 
-```{r example}
+```{r, results='hide',message=F}
 # list of packages that the functions in HultenRangeMaps require
 pkgs <- c("dplyr", "gdalUtilities", "geojsonio", "gtools", "igraph", "jpeg", "raster", "sf", "terra", "tidyr")
 

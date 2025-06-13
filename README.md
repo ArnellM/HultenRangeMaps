@@ -41,47 +41,10 @@ pth <- "C:/miniCran/HultenRangeMaps_miniCRAN_June2025"
 install.packages(pkgs, 
                  repos = paste0("file:///", pth),
                  type = "source")
-#> Installing packages into 'C:/Users/frar7633/AppData/Local/Temp/RtmpMLrpb7/temp_libpath21185af520bf'
-#> (as 'lib' is unspecified)
 
 # install HultenRange maps
 library(devtools)
-#> Loading required package: usethis
 install_github("ArnellM/HultenRangeMaps")
-#> Using GitHub PAT from the git credential store.
-#> Downloading GitHub repo ArnellM/HultenRangeMaps@HEAD
-#> utf8     (1.2.5 -> 1.2.6  ) [CRAN]
-#> tibble   (3.2.1 -> 3.3.0  ) [CRAN]
-#> curl     (6.2.2 -> 6.3.0  ) [CRAN]
-#> urltools (1.7.3 -> 1.7.3.1) [CRAN]
-#> V8       (6.0.3 -> 6.0.4  ) [CRAN]
-#> Installing 5 packages: utf8, tibble, curl, urltools, V8
-#> Installing packages into 'C:/Users/frar7633/AppData/Local/Temp/RtmpMLrpb7/temp_libpath21185af520bf'
-#> (as 'lib' is unspecified)
-#> 
-#>   There is a binary version available but the source version is later:
-#>          binary  source needs_compilation
-#> urltools  1.7.3 1.7.3.1              TRUE
-#> 
-#> package 'utf8' successfully unpacked and MD5 sums checked
-#> package 'tibble' successfully unpacked and MD5 sums checked
-#> package 'curl' successfully unpacked and MD5 sums checked
-#> package 'V8' successfully unpacked and MD5 sums checked
-#> 
-#> The downloaded binary packages are in
-#>  C:\Users\frar7633\AppData\Local\Temp\Rtmpma1dvX\downloaded_packages
-#> installing the source package 'urltools'
-#> ── R CMD build ─────────────────────────────────────────────────────────────────
-#>       ✔  checking for file 'C:\Users\frar7633\AppData\Local\Temp\Rtmpma1dvX\remotes29f8747574cc\ArnellM-HultenRangeMaps-02e7852e3d878fec9d759cbc7a86932c3ef4303b/DESCRIPTION'
-#>       ─  preparing 'HultenRangeMaps':
-#>    checking DESCRIPTION meta-information ...     checking DESCRIPTION meta-information ...   ✔  checking DESCRIPTION meta-information
-#>       ─  checking for LF line-endings in source and make files and shell scripts
-#>   ─  checking for empty or unneeded directories
-#>       ─  building 'HultenRangeMaps_0.0.0.9000.tar.gz'
-#>      
-#> 
-#> Installing package into 'C:/Users/frar7633/AppData/Local/Temp/RtmpMLrpb7/temp_libpath21185af520bf'
-#> (as 'lib' is unspecified)
 library(HultenRangeMaps)
 ```
 
