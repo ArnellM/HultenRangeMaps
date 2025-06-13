@@ -1,6 +1,6 @@
 #' Match species' ranges to (national) grid
 #'
-#' @param x file path to folder with range map database
+#' @param path file path to folder with range map database
 #' @param pattern file extension. Default is patterm = "*.geojson"
 #' @param grid (national) grid polygon feature
 #'
@@ -8,29 +8,22 @@
 #' @export
 #'
 
-rangeToGrid <- function(x,pattern="*.geojson", grid=SweNationalGrid){
-
+rangeToGrid <- function(path, pattern="*.geojson", grid=SweNationalGrid){
   if(!any(grepl("gridID", names(grid)))){stop("no column with name 'gridID' in 'grid'")}
-
   dat_list<-list() # create list
-
-  files_of_interest <- gtools::mixedsort(list.files(x, pattern = pattern)) # list files
-
-  for(i in seq_along(files_of_interest))  { # list files
+  files_of_interest <- gtools::mixedsort(list.files(path, pattern = pattern)) # list files
+  for(i in seq_along(files_of_interest))  {
     loop_file <- files_of_interest[i]
     species<-substring(loop_file,1,nchar(loop_file)-13) # scientific name - removing ".geojson" and map number
-
+    species <- gsub(" x ", " × ", species) # replace the letter x with the symbol × used in Dyntaxa (the Swedish Taxonomic Database) to denote hybrid species
+    # 1 - import file
     message(paste0("start processing of ", species, " (number ",i," out of ", length(files_of_interest), " species)"))
-
-    geoj <- sf::st_read(paste(x,loop_file, sep="")) # import GeoJSON polygon feature file
-
+    geoj <- sf::st_read(paste(path,loop_file, sep="")) # import GeoJSON polygon feature file
+    # 2 - transform file crs
     message(paste0("transform range map coordinates to grid coordinate reference system"))
-
     geoj_swe <-sf::st_transform(geoj, crs = sf::st_crs(grid)) # transform CRS to the CRS of the (national) grid
-
+    # 3 - identify and reduce size of polygons representing 'isolated finds'
     message(paste0("identify and reduce size of polygons representing 'isolated finds'"))
-
-    # 1 - calculate area and length to find "isolated finds"
     geoj_swe$area <- as.numeric(sf::st_area(geoj_swe)) # calculate polygon area
     # calculate length of polygons
     geoj_swe$length <- NA # new column
@@ -47,7 +40,6 @@ rangeToGrid <- function(x,pattern="*.geojson", grid=SweNationalGrid){
         geoj_swe$length[j] <- max(p$dist, na.rm=T) # get max distance
       }
     }
-
     # find "isolated finds" based on polygon size and length
     geoj_swe$point <- ifelse(geoj_swe$area/(((geoj_swe$length/2)^2)*pi)>0.55 # 1 =  all polygons that are 55% similar to a circle, 0 = all other polygons
                              & geoj_swe$length<24000 # AND less than 20000m long
@@ -55,10 +47,10 @@ rangeToGrid <- function(x,pattern="*.geojson", grid=SweNationalGrid){
     geoj_swe$point <- ifelse(is.na(geoj_swe$length), 0, geoj_swe$point) # set polygons with no length measurement to 0
     geoj_p <- geoj_swe[geoj_swe$point==1,] # subset "isolated finds"
     geoj_a <- geoj_swe[!geoj_swe$point==1,] # distribution area with "isolated finds" removed
-    # 2 - decrease the size of the "isolated finds" polygons
+    # decrease the size of the "isolated finds" polygons
     geoj_b <- sf::st_buffer(geoj_p, dist = -5000) # create negative buffer around each point
     geoj_m <- rbind(geoj_a, geoj_b) # combine
-    # 3 - intersect the (national) grid with historical range (spatial join)
+    # 4 - intersect the (national) grid with historical range (spatial join)
     message(paste0("match the (national) grid with the species' historical range"))
     intersects <- sf::st_join(grid,geoj_m, left = F)
     intersects <- sf::st_drop_geometry(intersects[,"gridID"])

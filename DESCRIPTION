@@ -1,9 +1,9 @@
 Package: HultenRangeMaps
-Title: What the Package Does (One Line, Title Case)
+Title: Historical distribution maps of vascular plants in north western Europe
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+    person("Matilda", "Arnell", , "matilda.arnell@su.se", role = c("aut", "cre"))
+Description: This package contains functions to extract distribution data from the maps in 'Atlas of the distribution of vascular plants in northwestern Europe' (Hultén 1971). A full description of the method is available in Arnell et al. XXXa. The resulting dataset is available from Arnell et al. XXXb.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8

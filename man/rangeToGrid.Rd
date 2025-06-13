@@ -4,10 +4,10 @@
 \alias{rangeToGrid}
 \title{Match species' ranges to (national) grid}
 \usage{
-rangeToGrid(x, pattern = "*.geojson", grid = SweNationalGrid)
+rangeToGrid(path, pattern = "*.geojson", grid = SweNationalGrid)
 }
 \arguments{
-\item{x}{file path to folder with range map database}
+\item{path}{file path to folder with range map database}
 
 \item{pattern}{file extension. Default is patterm = "*.geojson"}
 

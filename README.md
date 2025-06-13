@@ -1,1 +1,103 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
 # HultenRangeMaps
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+This package contains the methods employed to digitise the historical
+range maps in the ‘Atlas of the distribution of vascular plants in
+northwestern Europe’ (Hultén 1971). Methods include georeferencing the
+scanned maps, extract range data, clean data and convert data from
+raster to spatial feature (polygon) data. A detailed description of how
+the original atlas was compiled as well as the method used to
+georeference and digitize the distribution maps can be found in Arnell
+et al. (xxxx). The dataset can be found
+[here](https://researchdata.se/en/catalogue/dataset/2025-151/1?previewToken=6298dade-fc8b-4ba2-b553-fba50963b476).
+<br> The package contains two functions to extract and clean
+distribution data from the scanned maps, one function to modify file
+names and one function to match the distribution data to polygon grids
+commonly used when analysing historical atlas data.
+
+## Installation
+
+This package can be installed from [GitHub](https://github.com/) using
+the devtools package. To insure reproducability, we have created a
+‘mini’ repository with all the packages that the functions in
+HultenRangeMaps require. The repository can be downloaded
+[here](https://github.com/ArnellM/HultenRangeMaps_miniCRAN_June2025.git).
+First, download the repository to your computer. Then, install the
+packages from your local repository using the code below.
+
+``` r
+# list of packages that the functions in HultenRangeMaps require
+pkgs <- c("dplyr", "gdalUtilities", "geojsonio", "gtools", "igraph", "jpeg", "raster", "sf", "terra", "tidyr")
+
+# path to where you have downloaded the local miniCran repository
+pth <- "C:/miniCran/HultenRangeMaps_miniCRAN_June2025"
+
+# install packages from your local miniCRAN repository
+install.packages(pkgs, 
+                 repos = paste0("file:///", pth),
+                 type = "source")
+#> Installing packages into 'C:/Users/frar7633/AppData/Local/Temp/RtmpMLrpb7/temp_libpath21185af520bf'
+#> (as 'lib' is unspecified)
+
+# install HultenRange maps
+library(devtools)
+#> Loading required package: usethis
+install_github("ArnellM/HultenRangeMaps")
+#> Using GitHub PAT from the git credential store.
+#> Downloading GitHub repo ArnellM/HultenRangeMaps@HEAD
+#> utf8     (1.2.5 -> 1.2.6  ) [CRAN]
+#> tibble   (3.2.1 -> 3.3.0  ) [CRAN]
+#> curl     (6.2.2 -> 6.3.0  ) [CRAN]
+#> urltools (1.7.3 -> 1.7.3.1) [CRAN]
+#> V8       (6.0.3 -> 6.0.4  ) [CRAN]
+#> Installing 5 packages: utf8, tibble, curl, urltools, V8
+#> Installing packages into 'C:/Users/frar7633/AppData/Local/Temp/RtmpMLrpb7/temp_libpath21185af520bf'
+#> (as 'lib' is unspecified)
+#> 
+#>   There is a binary version available but the source version is later:
+#>          binary  source needs_compilation
+#> urltools  1.7.3 1.7.3.1              TRUE
+#> 
+#> package 'utf8' successfully unpacked and MD5 sums checked
+#> package 'tibble' successfully unpacked and MD5 sums checked
+#> package 'curl' successfully unpacked and MD5 sums checked
+#> package 'V8' successfully unpacked and MD5 sums checked
+#> 
+#> The downloaded binary packages are in
+#>  C:\Users\frar7633\AppData\Local\Temp\Rtmpma1dvX\downloaded_packages
+#> installing the source package 'urltools'
+#> ── R CMD build ─────────────────────────────────────────────────────────────────
+#>       ✔  checking for file 'C:\Users\frar7633\AppData\Local\Temp\Rtmpma1dvX\remotes29f8747574cc\ArnellM-HultenRangeMaps-02e7852e3d878fec9d759cbc7a86932c3ef4303b/DESCRIPTION'
+#>       ─  preparing 'HultenRangeMaps':
+#>    checking DESCRIPTION meta-information ...     checking DESCRIPTION meta-information ...   ✔  checking DESCRIPTION meta-information
+#>       ─  checking for LF line-endings in source and make files and shell scripts
+#>   ─  checking for empty or unneeded directories
+#>       ─  building 'HultenRangeMaps_0.0.0.9000.tar.gz'
+#>      
+#> 
+#> Installing package into 'C:/Users/frar7633/AppData/Local/Temp/RtmpMLrpb7/temp_libpath21185af520bf'
+#> (as 'lib' is unspecified)
+library(HultenRangeMaps)
+```
+
+<br>
+
+## Examples
+
+Examples of each function can be found in the package vignette.  
+<br>
+
+## References
+
+Arnell et al. (XXXa)
+
+Arnell et al. (XXXb)
+
+Hultén, E. (1971). Atlas of the distribution of vascular plants in
+northwestern Europe (2nd ed.). Generalstabens Litografiska Anstalts
+Förlag.
