@@ -22,7 +22,7 @@ This package contains the methods employed to digitise the historical range maps
 <br>
 The package contains two functions to extract and clean distribution data from the scanned maps, one function to modify file names and one function to match the distribution data to polygon grids commonly used when analysing historical atlas data.   
 <br>
-When using these data, please cite both the dataset (Arnell et al. XXXa) and the accompanying data paper (Arnell et al. XXXb).
+When using these data, please cite both the dataset (Arnell et al. XXXa) and the accompanying data paper (Arnell et al. XXXb).   
 <br>
 Below follows information on how to install the package as well as examples of how to use the different functions.   
 <br>
@@ -174,7 +174,7 @@ In the example above we match the historical distribution area of one species to
 <br>
 We exclude grid cells with 50% or more land surface outside Sweden’s national borders and grid cells covered to 80% or more by sea surface or waterways.  
 <br>
-```{r,out.width="100%"}
+```{r,out.width="75%"}
 # the Swedish national grids with enough land surface
 landGridsMap <- SweNationalGrid[SweNationalGrid$gridID %in% land_grids,]
 
@@ -195,7 +195,7 @@ To illustrate that the function can match the historical range data to any grid 
 In this example we store the *Galium* historical range maps in a temporary folder, match their distributions to the European grid and plot the number of *Galium* species per grid in Scandinavia based on their historical distributions.  
 <br>
 
-```{r,out.width="100%",results='hide',message=FALSE}
+```{r,out.width="75%",results='hide',message=FALSE}
 # add Galuim species ranges to the temporary folder
 for (i in names(galium_list)){
   sf::write_sf(galium_list[[i]],paste0(temp,"\\map_folder\\",i))
