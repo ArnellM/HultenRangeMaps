@@ -26,9 +26,9 @@ This package contains the methods employed to digitise the historical range maps
 <br>
 To aid spatial analyses of our data, we also provide a function that matches the digitized distribution maps to the Swedish 10×10 km National grid, or any polygon feature spatial grid.  
 <br>
-The dataset contains 1926 georeferenced and digitized historical distribution maps of vascular plants.The original maps have an effective resolution of 16×16 km and cover Scandinavia and Finland as well as parts of the Baltic countries, Germany and Russia.  
+The dataset contains 1926 georeferenced and digitized historical distribution maps of vascular plants.The original maps have an effective resolution of 16×16 km and cover Scandinavia and Finland as well as parts of the Baltic countries, Germany and Russia.The dataset can be found [here](https://researchdata.se/en/catalogue/dataset/2025-151/1?previewToken=6298dade-fc8b-4ba2-b553-fba50963b476).  
 <br>
-A detailed description of how the original atlas was compiled as well as the method used to georeference and digitize the distribution maps can be found in Arnell et al. (xxxx). The dataset can be found [here](https://researchdata.se/en/catalogue/dataset/2025-151/1?previewToken=6298dade-fc8b-4ba2-b553-fba50963b476).  
+A detailed description of how the original atlas was compiled as well as the method used to georeference and digitize the distribution maps can be found in Arnell et al. (xxxx).   
 <br>
 When using these data, please cite both the dataset (Arnell et al. XXXa) and the accompanying data paper (Arnell et al. XXXb).  
 <br>
@@ -71,16 +71,17 @@ gcps <- matrix(c(127.095, 54.15, 0, 70,
 
 # since the gdal functions require a file path, generate a temporary directory
 temp <- tempdir()
+dir.create(paste0(temp,"/map_folder/")) 
 
 # save the aligned example map in the temporary directory
-jpeg::writeJPEG(aligned_map,paste0(temp,"/aligned_map.jpg"))
+jpeg::writeJPEG(aligned_map, paste0(temp,"/map_folder/aligned_map.jpg"))
 
 # convert the aligned example map a to georeferenced GEOTiff by providing ground control points (translate) and reproject to WGS84 - World Geodetic System 1984 (EPSG:4326) (warp)
-gdalUtilities::gdal_translate(paste0(temp,"/aligned_map.jpg"), paste0(temp,"/gpc_map.tif"), of="GTiff", gcp= gcps)
-gdalUtilities::gdalwarp(paste0(temp,"/gpc_map.tif"), paste0(temp,"/ref_map.tif"), t_srs = "EPSG:4326", r="near",  order=3)
+gdalUtilities::gdal_translate(paste0(temp,"/map_folder/aligned_map.jpg"), paste0(temp,"/map_folder/gpc_map.tif"), of="GTiff", gcp= gcps)
+gdalUtilities::gdalwarp(paste0(temp,"/map_folder/gpc_map.tif"), paste0(temp,"/map_folder/ref_map.tif"), t_srs = "EPSG:4326", r="near",  order=3)
 
 # import and plot map
-ref_map <- raster::stack(paste0(temp,"/ref_map.tif")) # import GEOTiff
+ref_map <- raster::stack(paste0(temp,"/map_folder/ref_map.tif")) # import GEOTiff
 raster::plotRGB(ref_map) # plot map
 ```    
 <br>  
@@ -128,10 +129,10 @@ The function rangeToGrid() performs the steps described above. The function is d
 
 ```{r,results='hide',message=T}
 # save the example database map in the temporary directory
-geojsonio::geojson_write(database_map, file = paste0(temp,"\\Lycopodium alpinum_0001.geojson"))
+sf::st_write(database_map, paste0(temp,"/map_folder/Lycopodium alpinum_0001.geojson"))
 
-# when we retrieve maps from a temporary directory, we need to add '/' to the file path. This is not necessary if you have stored the database (XXX) in a folder on your computer
-list_histRange <- rangeToGrid(path = paste0(temp,"/"), pattern="*.geojson", grid=SweNationalGrid)
+# when we retrieve maps from a temporary directory, we need to add '\\' to the file path. This is not necessary if you have stored the database in a folder on your computer
+list_histRange <- rangeToGrid(path = paste0(temp,"\\map_folder\\"), pattern="*.geojson", grid=SweNationalGrid)
 
 # combine data frames (in this example there is only one)
 hist_pres <- do.call(rbind, list_histRange)
@@ -168,19 +169,18 @@ plot(histBiodivMap["histBiodiv"], border=NA, main="" )
 
 ## Bonus example: match the digitized distribution maps to the European 10x10 grid in Scandinavia
 To illustrate that the function can match the historical range data to any grid data (as long as the grid is a polygon spatial feature with one attribute column named 'gridID'), we have included another example. Included in this package is a list of files with the historical ranges of the Scandinavian *Galium* species (N=14) from the database as well as the part of the European 10x10 that covers Scandinavia and Finland.  
-<br>  
+<br>
 In this example we store the *Galium* historical range maps in a temporary folder, match their distributions to the European grid and plot the number of *Galium* species per grid in Scandinavia based on their historical distributions.  
 <br>
-
 
 ```{r,out.width="50%",results='hide',message=FALSE}
 # add Galuim species ranges to the temporary folder
 for (i in names(galium_list)){
-  sf::write_sf(galium_list[[i]],paste0(temp,"\\",i))
+  sf::write_sf(galium_list[[i]],paste0(temp,"\\map_folder\\",i))
 }
 
 # match historical distributions of Galium species to the European grid (this will take some time since there are 14 Galium species in the database)
-list_histRangeScan <- rangeToGrid(paste0(temp,"/"),pattern="*Galium*", grid = ScanGrid)
+list_histRangeScan <- rangeToGrid(paste0(temp,"\\map_folder\\"),pattern="*Galium*", grid = ScanGrid)
 
 # combine data frames
 hist_pres_scan <- do.call(rbind, list_histRangeScan)
@@ -208,7 +208,7 @@ Changing x to × is also done in the function rangeToGrid() to insure that the f
 <br>
 
 ```{r}
-path <- ".../HultenRangeMapDatabase/"
+path <- "/HultenRangeMapDatabase/"
 fixFileNames(path, pattern = "*.geojson")
 ```
 
@@ -220,12 +220,12 @@ To insure reproducability, we have created a 'miniCRAN' repository with all the 
 First, download the repository to your computer. Then, install the packages from your local repository using the code below.  
 <br>
 
-```{r,results='hide',message=FALSE}
+```{r eval=FALSE, message=FALSE}
 # list of packages that the functions in HultenRangeMaps require
 pkgs <- c("dplyr", "gdalUtilities", "geojsonio", "gtools", "igraph", "jpeg", "raster", "sf", "terra", "tidyr")
 
 # path to where you have downloaded the local miniCran repository
-pth <- "C:/miniCran/HultenRangeMaps_miniCRAN_June2025"
+pth <- "/HultenRangeMaps_miniCRAN_June2025"
 
 # install packages from your local miniCRAN repository
 install.packages(pkgs, 
@@ -237,7 +237,7 @@ install.packages(pkgs,
 <br>
 
 ## References
-Arnell et al. (XXXa)  
+Arnell, M., Auffret, A., & Hylander, K. (2025). Historical distribution maps of vascular plants in northwestern Europe (Version 1) [Data set]. Stockholm University. DOI: Available after publication. 
 
 Arnell et al. (XXXb)  
 

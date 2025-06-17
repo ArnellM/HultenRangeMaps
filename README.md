@@ -14,18 +14,19 @@ raster to spatial feature (polygon) data. A detailed description of how
 the original atlas was compiled as well as the method used to
 georeference and digitize the distribution maps can be found in Arnell
 et al. (xxxx). The dataset can be found
-[here](https://researchdata.se/en/catalogue/dataset/2025-151/1?previewToken=6298dade-fc8b-4ba2-b553-fba50963b476).
-<br> The package contains two functions to extract and clean
-distribution data from the scanned maps, one function to modify file
-names and one function to match the distribution data to polygon grids
-commonly used when analysing historical atlas data.
+[here](https://researchdata.se/en/catalogue/dataset/2025-151/1?previewToken=6298dade-fc8b-4ba2-b553-fba50963b476).  
+<br>  
+The package contains two functions to extract and clean distribution
+data from the scanned maps, one function to modify file names and one
+function to match the distribution data to polygon grids commonly used
+when analysing historical atlas data.
 
 ## Installation
 
-This package can be installed from [GitHub](https://github.com/) using
-the devtools package. To insure reproducability, we have created a
-‘mini’ repository with all the packages that the functions in
-HultenRangeMaps require. The repository can be downloaded
+This package can be installed using the devtools package. To insure
+reproducability, we have created a ‘mini’ repository with all the
+packages that the functions in HultenRangeMaps require. The repository
+can be downloaded
 [here](https://github.com/ArnellM/HultenRangeMaps_miniCRAN_June2025.git).
 First, download the repository to your computer. Then, install the
 packages from your local repository using the code below.
@@ -50,17 +51,375 @@ library(HultenRangeMaps)
 
 <br>
 
-## Examples
+## Introduction
 
-Examples of each function can be found in the package vignette.  
+This package contains the methods employed to digitise the historical
+range maps in the ‘Atlas of the distribution of vascular plants in
+northwestern Europe’ (Hultén 1971). Methods include georeferencing the
+scanned maps, extract range data, clean data and convert data from
+raster to spatial feature (polygon) data.  
+<br> To aid spatial analyses of our data, we also provide a function
+that matches the digitized distribution maps to the Swedish 10×10 km
+National grid, or any polygon feature spatial grid.  
+<br> The dataset contains 1926 georeferenced and digitized historical
+distribution maps of vascular plants.The original maps have an effective
+resolution of 16×16 km and cover Scandinavia and Finland as well as
+parts of the Baltic countries, Germany and Russia.The dataset can be
+found
+[here](https://researchdata.se/en/catalogue/dataset/2025-151/1?previewToken=6298dade-fc8b-4ba2-b553-fba50963b476).  
+<br> A detailed description of how the original atlas was compiled as
+well as the method used to georeference and digitize the distribution
+maps can be found in Arnell et al. (xxxx).  
+<br> When using these data, please cite both the dataset (Arnell et
+al. XXXa) and the accompanying data paper (Arnell et al. XXXb).  
+<br> To insure reproducability, we have created a ‘mini’ repository with
+all the packages that the functions in HultenRangeMaps require. The
+repository can be downloaded
+[here](https://github.com/ArnellM/HultenRangeMaps_miniCRAN_June2025.git).
+In the end of this document is a short guide on how to install packages
+from local repositories.  
+<br> *Note:* The current scientific names of the species in the dataset
+are retrieved from the Swedish Taxonomic Database (Dyntaxa). In Dyntaxa,
+hybrid species are denoted by the symbol ×. To facilitate file handling
+the symbol × has been replaced by the letter x in the database file
+names. The function fixFileNames() changes the letter x in the file
+names back the symbol ×. The function rangeToGrid() performs the same
+step when retrieving the species name from the file name and works
+irrespective of weather the symbol has been changed or not.  
+<br>
+
+## Aligning the scanned maps
+
+High accuracy in automated georeferencing can only be attained if the
+maps are perfectly aligned. Due to the manual printing process in 1970,
+this was not always the case (Figure 7 in Arnell et al XXX). Given the
+small scale of the maps a 1 mm offset of a map to the reference map
+results in an approximate 20 km offset in the georeferenced maps.  
+<br> This problem was reduced by aligning the images using the plugin
+program bUnwarpJ (Sorzano et al. 2005, Arganda-Carreras et al. 2006) in
+the image processing program Fiji ImageJ (Schindelin et al. 2012). The
+script used to align the maps is included in the Supplementary
+information of the data paper (Arnell et al XXXb).  
+<br>
+
+## Georeferencing scanned and aligned maps
+
+Georeferencing is the process of assigning coordinates of a known
+coordinate reference system to each pixel of the scanned map. This is
+done by choosing points on the map corresponding to ground control
+points (GCPs). Ground control points are points on the surface of the
+earth with known coordinates.  
+<br> In this project we choose 16 GCPs at the longitudes and latitudes
+marked on the scanned maps (Figure 6 in Arnell et al XXX). These 16
+points were complemented with 4 GCPs in areas where locations on the
+printed map deviated from the actual locations (the coast of Norway and
+Denmark and the island of Gotland). The manual georeferencing was
+performed in QGIS (QGIS Development Team 2022).  
+<br>
+
+``` r
+# ground control points
+gcps <- matrix(c(127.095, 54.15, 0, 70,
+                 566.228, 149.247, 10, 70,
+                 1014.47, 185.013, 20, 70,
+                 1459.87, 148.411, 30, 70,
+                 1894.52, 43.1847, 40, 70,
+                 195.246, 743.443, 5, 65,
+                 738.246, 823.491, 15, 65,
+                 1286.45, 822.073, 25, 65,
+                 1823.77, 737.613, 35, 65,
+                 2090.39, 665.129, 40, 65,
+                 47.442, 1378.15, 5, 60,
+                 688.768, 1474.27, 15, 60,
+                 1334.66, 1472.54, 25, 60,
+                 1971.58, 1374.53, 35, 60,
+                 267.179, 2078.65, 10, 55,
+                 1011.56, 2136.63, 20, 55),
+               ncol = 4, byrow = TRUE) # the gcps are retrived from the Qgis gdal script, minus the first "-gcp". 
+
+# since the gdal functions require a file path, generate a temporary directory
+temp <- tempdir()
+dir.create(paste0(temp,"/map_folder/")) 
+
+# save the aligned example map in the temporary directory
+jpeg::writeJPEG(aligned_map, paste0(temp,"/map_folder/aligned_map.jpg"))
+
+# convert the aligned example map a to georeferenced GEOTiff by providing ground control points (translate) and reproject to WGS84 - World Geodetic System 1984 (EPSG:4326) (warp)
+gdalUtilities::gdal_translate(paste0(temp,"/map_folder/aligned_map.jpg"), paste0(temp,"/map_folder/gpc_map.tif"), of="GTiff", gcp= gcps)
+gdalUtilities::gdalwarp(paste0(temp,"/map_folder/gpc_map.tif"), paste0(temp,"/map_folder/ref_map.tif"), t_srs = "EPSG:4326", r="near",  order=3)
+
+# import and plot map
+ref_map <- raster::stack(paste0(temp,"/map_folder/ref_map.tif")) # import GEOTiff
+raster::plotRGB(ref_map) # plot map
+```
+
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" /> <br>
+
+## Digitise scanned and aligned range maps
+
+The maps were printed in only two colors (see the map above and Figure
+1-7 in Arnell et al. XXX) with distribution areas represented in dark
+red and geographical borders represented in green. We can therefore
+extract the range data from the georeferenced raster images by
+extracting the red pixel values (Figure 8 et al. XXX).  
+<br>  
+The function mapDig() takes a scanned range map (raster stack) with
+three bands (Red-Green-Blue) and extracts the range information by
+taking the green raster band and setting pixel values 1-150 to 1 and all
+other to 0. The pixel range 0-150 in green raster band represents the
+dark red areas in the scanned map.  
+<br>
+
+``` r
+dig_map <- mapDig(ref_map) # digitise the georeferenced map
+raster::plot(dig_map, col="black",legend=F) # plot map
+```
+
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+
+## Automated data cleaning and conversion from raster to spatial features
+
+After extracting the range data, we remove (most of) the border, map
+number and legend (also represented in red on the maps). To remove small
+digitalization errors we identify ‘clumps’ of connected cells and remove
+clumps with \<15 cells. We then convert rasters to polygon spatial
+features. <br>  
+The function mapCleanConvert() performs the steps described above.  
+<br>
+
+``` r
+clean_map <- mapCleanConvert(dig_map)
+#> Loading required namespace: igraph
+terra::plot(clean_map)
+```
+
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+
+<br>
+
+## Manual data cleaning and updated scientific nomenclature
+
+The cleaned map may still contain small digitization errors (part of the
+map border), as well as map symbols that represent non-presence points,
+e.g. locally extinct populations (open circle) and fossil records
+(crosses). These have been manually removed from the maps in the
+database. Please refer to the description in Arnell et al. XXX and the
+file HultenMetadata.csv in the database (Arnell et al. XXX) for
+information on manual editing as well as updated scientific
+nomenclature.  
+<br>
+
+## Example: how to match the digitized distribution maps to the Swedish National grid
+
+To aid spatial analyses of our data, we provide an example on how to
+match the digitized distribution maps to the Swedish 10×10 km National
+grid, commonly employed in Swedish regional plant inventories. The
+outcome is a list of data frames with historical presence per grid cell
+per species. <br>
+
+There are two main types of symbols representing a species’ range in the
+original maps. Hatched areas representing areas where the species is
+common to less common and dots representing isolated finds (Figure 3 in
+Arnell et al. XXX). Given the scale of the original maps, the size of
+the dots representing isolated finds is approximately 16 km on the
+ground. This means that if we overlap the digitized and cleaned range
+maps (polygon features) with the 10×10 km Swedish National grid one
+‘isolated find’ polygon will commonly overlap with 4-6 10×10 km grid
+cells, thus potentially over representing the historical range of a
+species. We overcome this by identifying ‘isolated finds’ polygons
+(features with circular shapes and of the right size) and reduce the
+area of these polygons by a 5000 m negative buffer.  
+<br>
+
+The function rangeToGrid() performs the steps described above. The
+function is designed to take a file path to the directory where the
+database (XXX) is stored. In this example we save an example database
+map of *Lycopodium alpinum* in a temporary directory.  
+<br>
+
+**NOTE:** for the function to work the grid needs to be a polygon
+spatial feature with gridIDs stored in an attribute column named
+‘gridID’  
+<br>
+
+``` r
+# save the example database map in the temporary directory
+sf::st_write(database_map, paste0(temp,"/map_folder/Lycopodium alpinum_0001.geojson"))
+
+# when we retrieve maps from a temporary directory, we need to add '\\' to the file path. This is not necessary if you have stored the database in a folder on your computer
+list_histRange <- rangeToGrid(path = paste0(temp,"\\map_folder\\"), pattern="*.geojson", grid=SweNationalGrid)
+#> start processing of Lycopodium alpinum (number 1 out of 1 species)
+#> transform range map coordinates to grid coordinate reference system
+#> identify and reduce size of polygons representing 'isolated finds'
+#> match the (national) grid with the species' historical range
+#> create dataframe with historical precence per grid
+#> ------------------
+
+# combine data frames (in this example there is only one)
+hist_pres <- do.call(rbind, list_histRange)
+rownames(hist_pres) <- NULL
+```
+
+<br>
+
+``` r
+# historical presence per species per grid
+head(hist_pres)
+#>   gridID     scientificName histPres
+#> 1  11F6i Lycopodium alpinum        1
+#> 2  11E8g Lycopodium alpinum        1
+#> 3  11E8i Lycopodium alpinum        1
+#> 4  13D0c Lycopodium alpinum        1
+#> 5  13D0e Lycopodium alpinum        1
+#> 6  13D0g Lycopodium alpinum        1
+```
+
+<br>
+
+## Historical biodiversity of vascular plants in Sweden
+
+In the example above we match the historical distribution area of one
+species to the Swedish national grid. Included in the database (and in
+this package) is a file ‘histPresSweNationalGrid.csv’ with per grid
+historical presence of all species in the database produced using the
+method above. This can be used to produce a map of the historical
+biodiversity of vascular plants in Sweden.  
+<br> We exclude grid cells with 50% or more land surface outside
+Sweden’s national borders and grid cells covered to 80% or more by sea
+surface or waterways.  
+<br>
+
+``` r
+# the Swedish national grids with enough land surface
+landGridsMap <- SweNationalGrid[SweNationalGrid$gridID %in% land_grids,]
+
+# count number of species per grid
+hist_biodiv <- setNames(aggregate(histPres ~ gridID, histPresSweNationalGrid, sum),c("gridID", "histBiodiv"))
+
+# add historical biodiversity data to map
+histBiodivMap <- merge(landGridsMap, hist_biodiv)
+
+#plot!
+plot(histBiodivMap["histBiodiv"], border=NA, main="" )
+```
+
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="50%" /> <br>
+
+## Bonus example: match the digitized distribution maps to the European 10x10 grid in Scandinavia
+
+To illustrate that the function can match the historical range data to
+any grid data (as long as the grid is a polygon spatial feature with one
+attribute column named ‘gridID’), we have included another example.
+Included in this package is a list of files with the historical ranges
+of the Scandinavian *Galium* species (N=14) from the database as well as
+the part of the European 10x10 that covers Scandinavia and Finland.  
+<br> In this example we store the *Galium* historical range maps in a
+temporary folder, match their distributions to the European grid and
+plot the number of *Galium* species per grid in Scandinavia based on
+their historical distributions.  
+<br>
+
+``` r
+# add Galuim species ranges to the temporary folder
+for (i in names(galium_list)){
+  sf::write_sf(galium_list[[i]],paste0(temp,"\\map_folder\\",i))
+}
+
+# match historical distributions of Galium species to the European grid (this will take some time since there are 14 Galium species in the database)
+list_histRangeScan <- rangeToGrid(paste0(temp,"\\map_folder\\"),pattern="*Galium*", grid = ScanGrid)
+
+# combine data frames
+hist_pres_scan <- do.call(rbind, list_histRangeScan)
+rownames(hist_pres_scan) <- NULL
+```
+
+``` r
+# count number of species per grid
+hist_Galium_biodiv_scan <- setNames(aggregate(histPres ~ gridID, hist_pres_scan, sum),c("gridID", "histBiodiv"))
+
+# add historical biodiversity data to map
+histGaliumBiodivScan <- merge(ScanGrid, hist_Galium_biodiv_scan, all.x=T)
+
+# plot!
+plot(histGaliumBiodivScan["histBiodiv"], border=NA, main="")
+```
+
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="50%" />
+
+<br>
+
+## Fix file names
+
+In the Swedish Taxonomic Database Dyntaxa, hybrid species are denoted by
+the symbol ×. To facilitate file handling the symbol × has been replaced
+by the letter x in the database file names. The function fixFileNames()
+changes the letter x in the file names back the symbol × so that the
+file names are identical to the Dyntaxa scientific names.  
+<br> Changing x to × is also done in the function rangeToGrid() to
+insure that the file with per species per grid historical presence
+matches the scientific names in the Dyntaxa database.  
+<br>
+
+``` r
+path <- "/HultenRangeMapDatabase/"
+fixFileNames(path, pattern = "*.geojson")
+```
+
+<br>
+
+## Guide: how to install packages from local repositories
+
+To insure reproducability, we have created a ‘miniCRAN’ repository with
+all the packages that the functions in HultenRangeMaps require (and the
+packages that they in turn require). The repository can be downloaded
+[here](https://github.com/ArnellM/HultenRangeMaps_miniCRAN_June2025.git).  
+<br> First, download the repository to your computer. Then, install the
+packages from your local repository using the code below.  
+<br>
+
+``` r
+# list of packages that the functions in HultenRangeMaps require
+pkgs <- c("dplyr", "gdalUtilities", "geojsonio", "gtools", "igraph", "jpeg", "raster", "sf", "terra", "tidyr")
+
+# path to where you have downloaded the local miniCran repository
+pth <- "/HultenRangeMaps_miniCRAN_June2025"
+
+# install packages from your local miniCRAN repository
+install.packages(pkgs, 
+                 repos = paste0("file:///", pth),
+                 type = "source")
+```
+
 <br>
 
 ## References
 
-Arnell et al. (XXXa)
+Arnell, M., Auffret, A., & Hylander, K. (2025). Historical distribution
+maps of vascular plants in northwestern Europe (Version 1) \[Data set\].
+Stockholm University. DOI: Available after publication.
 
 Arnell et al. (XXXb)
 
 Hultén, E. (1971). Atlas of the distribution of vascular plants in
 northwestern Europe (2nd ed.). Generalstabens Litografiska Anstalts
 Förlag.
+
+Sorzano, C. O. S., Thevenaz, P., & Unser, M. (2005). Elastic
+registration of biological images using vector-spline regularization.
+IEEE Transactions on Biomedical Engineering, 52(4), 652–663. IEEE
+Transactions on Biomedical Engineering.
+<https://doi.org/10.1109/TBME.2005.844030>
+
+Arganda-Carreras, I., Sorzano, C. O. S., Marabini, R., Carazo, J. M.,
+Ortiz-de-Solorzano, C., & Kybic, J. (2006). Consistent and Elastic
+Registration of Histological Sections Using Vector-Spline
+Regularization. In R. R. Beichel & M. Sonka (Eds.), Computer Vision
+Approaches to Medical Image Analysis (Vol. 4241, pp. 85–95). Springer
+Berlin Heidelberg. <https://doi.org/10.1007/11889762_8>
+
+Schindelin, J., Arganda-Carreras, I., Frise, E., Kaynig, V., Longair,
+M., Pietzsch, T., Preibisch, S., Rueden, C., Saalfeld, S., Schmid, B.,
+Tinevez, J.-Y., White, D. J., Hartenstein, V., Eliceiri, K., Tomancak,
+P., & Cardona, A. (2012). Fiji: An open-source platform for
+biological-image analysis. Nature Methods, 9(7), Article 7.
+<https://doi.org/10.1038/nmeth.2019>
