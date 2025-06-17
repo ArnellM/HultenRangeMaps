@@ -15,11 +15,15 @@ the original atlas was compiled as well as the method used to
 georeference and digitize the distribution maps can be found in Arnell
 et al. (xxxx). The dataset can be found
 [here](https://researchdata.se/en/catalogue/dataset/2025-151/1?previewToken=6298dade-fc8b-4ba2-b553-fba50963b476).  
-<br>  
-The package contains two functions to extract and clean distribution
-data from the scanned maps, one function to modify file names and one
-function to match the distribution data to polygon grids commonly used
-when analysing historical atlas data.
+<br> The package contains two functions to extract and clean
+distribution data from the scanned maps, one function to modify file
+names and one function to match the distribution data to polygon grids
+commonly used when analysing historical atlas data.  
+<br> When using these data, please cite both the dataset (Arnell et
+al. XXXa) and the accompanying data paper (Arnell et al. XXXb). <br>
+Below follows information on how to install the package as well as
+examples of how to use the different functions.  
+<br>
 
 ## Installation
 
@@ -70,14 +74,6 @@ found
 <br> A detailed description of how the original atlas was compiled as
 well as the method used to georeference and digitize the distribution
 maps can be found in Arnell et al. (xxxx).  
-<br> When using these data, please cite both the dataset (Arnell et
-al. XXXa) and the accompanying data paper (Arnell et al. XXXb).  
-<br> To insure reproducability, we have created a ‘mini’ repository with
-all the packages that the functions in HultenRangeMaps require. The
-repository can be downloaded
-[here](https://github.com/ArnellM/HultenRangeMaps_miniCRAN_June2025.git).
-In the end of this document is a short guide on how to install packages
-from local repositories.  
 <br> *Note:* The current scientific names of the species in the dataset
 are retrieved from the Swedish Taxonomic Database (Dyntaxa). In Dyntaxa,
 hybrid species are denoted by the symbol ×. To facilitate file handling
@@ -303,7 +299,7 @@ histBiodivMap <- merge(landGridsMap, hist_biodiv)
 plot(histBiodivMap["histBiodiv"], border=NA, main="" )
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="50%" /> <br>
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" /> <br>
 
 ## Bonus example: match the digitized distribution maps to the European 10x10 grid in Scandinavia
 
@@ -344,7 +340,7 @@ histGaliumBiodivScan <- merge(ScanGrid, hist_Galium_biodiv_scan, all.x=T)
 plot(histGaliumBiodivScan["histBiodiv"], border=NA, main="")
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="50%" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
 
 <br>
 
@@ -363,31 +359,6 @@ matches the scientific names in the Dyntaxa database.
 ``` r
 path <- "/HultenRangeMapDatabase/"
 fixFileNames(path, pattern = "*.geojson")
-```
-
-<br>
-
-## Guide: how to install packages from local repositories
-
-To insure reproducability, we have created a ‘miniCRAN’ repository with
-all the packages that the functions in HultenRangeMaps require (and the
-packages that they in turn require). The repository can be downloaded
-[here](https://github.com/ArnellM/HultenRangeMaps_miniCRAN_June2025.git).  
-<br> First, download the repository to your computer. Then, install the
-packages from your local repository using the code below.  
-<br>
-
-``` r
-# list of packages that the functions in HultenRangeMaps require
-pkgs <- c("dplyr", "gdalUtilities", "geojsonio", "gtools", "igraph", "jpeg", "raster", "sf", "terra", "tidyr")
-
-# path to where you have downloaded the local miniCran repository
-pth <- "/HultenRangeMaps_miniCRAN_June2025"
-
-# install packages from your local miniCRAN repository
-install.packages(pkgs, 
-                 repos = paste0("file:///", pth),
-                 type = "source")
 ```
 
 <br>
