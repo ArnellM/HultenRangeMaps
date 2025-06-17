@@ -27,9 +27,9 @@ examples of how to use the different functions.
 
 ## Installation
 
-This package can be installed using the devtools package. To insure
+This package can be installed using `devtools`. To insure
 reproducability, we have created a ‘mini’ repository with all the
-packages that the functions in HultenRangeMaps require. The repository
+packages that the functions in `HultenRangeMaps` require. The repository
 can be downloaded
 [here](https://github.com/ArnellM/HultenRangeMaps_miniCRAN_June2025.git).
 First, download the repository to your computer. Then, install the
