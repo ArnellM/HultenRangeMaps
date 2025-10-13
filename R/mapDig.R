@@ -10,7 +10,7 @@
 #'
 
 mapDig <- function(x,value=150){
-  gr <- x$ref_map_2 # select only the green band
+  gr <- x[[2]] # select only the green band
   raster::calc(gr, fun=function(x){base::ifelse(x<=value,1,NA)}) # set "dark red" pixel values to 1 and all other to NA
 
 }
