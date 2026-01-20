@@ -74,7 +74,24 @@
 #' Swedish 10×10 km national grid
 #'
 #' @format
-#' Spatial polygon feature, projected gcs SWEREF99 TM, EPSG:3006
+#' Spatial polygon feature, gcs WGS 84 -- WGS84 - World Geodetic System 1984, EPSG:4326
 #'
 "SweNationalGrid"
 
+#' Map of northern Europe
+#'
+#' Polygon features of countries in Northern Europe
+#'
+#' @format
+#' Spatial polygon features, projected gcs SWEREF99 TM, EPSG:3006
+#'
+"NorthernEurope"
+
+#' Lycopodium complanatum range map
+#'
+#' Polygon features of the range of Lycopodium complanatum
+#'
+#' @format
+#' Spatial polygon features, gcs WGS 84 -- WGS84 - World Geodetic System 1984, EPSG:4326
+#'
+"Lycopodium_complanatum_00004"

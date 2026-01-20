@@ -4,6 +4,7 @@
 # HultenRangeMaps
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 This package contains the methods employed to digitise the historical
@@ -205,6 +206,38 @@ information on manual editing as well as updated scientific
 nomenclature.  
 <br>
 
+## Database of digitized distribution maps
+
+The final range maps in the database represent the original data. The
+only features that have been removed are symbols that represent
+non-presence points, e.g. locally extinct populations (open circle) and
+fossil records (crosses). It is important to note that the nature of the
+original data sometimes results in ranges that extend past land borders
+into water for terrestrial plants. Depending on the application of the
+data you may need to correct for this prior to analyses. <br>
+
+``` r
+# Example of a range that extends past land borders
+plot(sf::st_geometry(NorthernEurope), col = "gray", border = NA, axes=T, xlim=c(10,35), ylim = c(55,71))
+plot(sf::st_geometry(Lycopodium_complanatum_00004), col = "black", border = NA,
+     axes=F, add=T)    
+polygon(x=c(16.5, 16.5,20, 20, 16.5), 
+        y=c(60, 62,62,60,60), 
+        col=NA,
+        border='red')
+```
+
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
+
+``` r
+# One part of the range that extends past land borders
+plot(sf::st_geometry(NorthernEurope), col = "gray", border = NA, axes=T,xlim=c(16.5,20), ylim = c(60,62))
+plot(sf::st_geometry(Lycopodium_complanatum_00004), col = "black", border = NA, xlim=c(16.5,20), ylim = c(60,62), axes=F, add=T)                
+polygon(x=c(16.5, 16.5,20, 20, 16.5), y=c(60, 62,62,60,60), col=NA, border='red', lwd=2) 
+```
+
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" /> <br>
+
 ## Example: how to match the digitized distribution maps to the Swedish National grid
 
 To aid spatial analyses of our data, we provide an example on how to
@@ -291,7 +324,7 @@ histBiodivMap <- merge(landGridsMap, hist_biodiv)
 plot(histBiodivMap["histBiodiv"], border=NA, main="" )
 ```
 
-<img src="man/figures/README-unnamed-chunk-9-1.png" width="75%" /> <br>
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="75%" /> <br>
 
 ## Bonus example: match the digitized distribution maps to the European 10×10 km grid in Scandinavia
 
@@ -332,7 +365,7 @@ histGaliumBiodivScan <- merge(ScanGrid, hist_Galium_biodiv_scan, all.x=T)
 plot(histGaliumBiodivScan["histBiodiv"], border=NA, main="")
 ```
 
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="75%" />
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="75%" />
 
 <br>
 

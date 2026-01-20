@@ -5,7 +5,7 @@
 \alias{SweNationalGrid}
 \title{Swedish 10×10 km national grid}
 \format{
-Spatial polygon feature, projected gcs SWEREF99 TM, EPSG:3006
+Spatial polygon feature, gcs WGS 84 -- WGS84 - World Geodetic System 1984, EPSG:4326
 }
 \usage{
 SweNationalGrid
