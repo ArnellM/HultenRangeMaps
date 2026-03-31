@@ -15,7 +15,7 @@ raster to spatial polygon data. A detailed description of how the
 original atlas was compiled as well as the method used to georeference
 and digitize the distribution maps can be found in Arnell et
 al. (2026a). The dataset can be found
-[here](https://researchdata.se/en/catalogue/dataset/2025-151/1?previewToken=6298dade-fc8b-4ba2-b553-fba50963b476).  
+[here](https://doi.org/10.58141/y1x5-cx68).  
 <br> The package contains two functions to extract and clean
 distribution data from the scanned maps, one function to modify file
 names and one function to match the distribution data to polygon grids
@@ -69,8 +69,7 @@ maps to the Swedish 10×10 km National grid, or any spatial grid.
 distribution maps of vascular plants. The original maps have an
 effective resolution of 16×16 km and cover Scandinavia and Finland as
 well as parts of the Baltic countries, Germany and Russia. The dataset
-can be found
-[here](https://researchdata.se/en/catalogue/dataset/2025-151/1?previewToken=6298dade-fc8b-4ba2-b553-fba50963b476).  
+can be found [here](https://doi.org/10.58141/y1x5-cx68).  
 <br> A detailed description of how the original atlas was compiled as
 well as the method used to georeference and digitize the distribution
 maps can be found in Arnell et al. (2026a).  
