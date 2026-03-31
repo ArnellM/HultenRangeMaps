@@ -13,15 +13,15 @@ northwestern Europe’ (Hultén 1971). Methods include georeferencing the
 scanned maps, extract range data, clean data and convert data from
 raster to spatial polygon data. A detailed description of how the
 original atlas was compiled as well as the method used to georeference
-and digitize the distribution maps can be found in Arnell et al. (xxxx).
-The dataset can be found
+and digitize the distribution maps can be found in Arnell et
+al. (2026a). The dataset can be found
 [here](https://researchdata.se/en/catalogue/dataset/2025-151/1?previewToken=6298dade-fc8b-4ba2-b553-fba50963b476).  
 <br> The package contains two functions to extract and clean
 distribution data from the scanned maps, one function to modify file
 names and one function to match the distribution data to polygon grids
 commonly used when analysing historical atlas data.  
 <br> When using these data, please cite both the dataset (Arnell et
-al. XXXa) and the accompanying data paper (Arnell et al. XXXb).  
+al. 2026b) and the accompanying data paper (Arnell et al. 2026a).  
 <br> Below follows information on how to install the package as well as
 examples of how to use the different functions.  
 <br>
@@ -73,7 +73,7 @@ can be found
 [here](https://researchdata.se/en/catalogue/dataset/2025-151/1?previewToken=6298dade-fc8b-4ba2-b553-fba50963b476).  
 <br> A detailed description of how the original atlas was compiled as
 well as the method used to georeference and digitize the distribution
-maps can be found in Arnell et al. (xxxx).  
+maps can be found in Arnell et al. (2026a).  
 <br> *Note:* The current scientific names of the species in the dataset
 are retrieved from the Swedish Taxonomic Database (Dyntaxa). In Dyntaxa,
 hybrid species are denoted by the symbol ×. To facilitate file handling
@@ -88,14 +88,14 @@ irrespective of weather the symbol has been changed or not.
 
 High accuracy in automated georeferencing can only be attained if the
 maps are perfectly aligned. Due to the manual printing process in 1970,
-this was not always the case (Figure 7 in Arnell et al XXX). Given the
+this was not always the case (Figure 7 in Arnell et al 2026a). Given the
 small scale of the maps a 1 mm offset of a map to the reference map
 results in an approximate 20 km offset in the georeferenced maps.  
 <br> This problem was reduced by aligning the images using the plugin
 program bUnwarpJ (Sorzano et al. 2005, Arganda-Carreras et al. 2006) in
 the image processing program Fiji ImageJ (Schindelin et al. 2012). The
 script used to align the maps is included in the Supplementary
-information of the data paper (Arnell et al XXXb).  
+information of the data paper (Arnell et al 2026a).  
 <br>
 
 ## Georeferencing scanned and aligned maps
@@ -106,7 +106,7 @@ done by choosing points on the map corresponding to ground control
 points (GCPs). Ground control points are points on the surface of the
 earth with known coordinates.  
 <br> In this project we choose 16 GCPs at the longitudes and latitudes
-marked on the scanned maps (Figure 6 in Arnell et al XXX). These 16
+marked on the scanned maps (Figure 6 in Arnell et al 2026a). These 16
 points were complemented with 4 GCPs in areas where locations on the
 printed map deviated from the actual locations (the coast of Norway and
 Denmark and the island of Gotland). The manual georeferencing was
@@ -156,15 +156,15 @@ raster::plotRGB(ref_map) # plot map
 ## Digitise scanned and aligned range maps
 
 The maps were printed in only two colors (see the map above and Figure
-1-7 in Arnell et al. XXXb) with distribution areas represented in dark
+1-7 in Arnell et al. 2026a) with distribution areas represented in dark
 red and geographical borders represented in green. We can therefore
 extract the range data from the georeferenced raster images by
-extracting the red pixel values (Figure 8 in Arnell et al. XXXb).  
+extracting the red pixel values (Figure 8 in Arnell et al. 2026a).  
 <br> The function mapDig() takes a scanned range map (raster stack) with
 three bands (Red-Green-Blue) and extracts the range information by
 taking the green raster band and setting pixel values 1-150 to 1 and all
-other to 0. The pixel range 0-150 in green raster band represents the
-dark red areas in the scanned map.  
+other to 0. The pixel range 0-150 in the green raster band represents
+the dark red areas in the scanned map.  
 <br>
 
 ``` r
@@ -200,8 +200,8 @@ The cleaned map may still contain small digitization errors (part of the
 map border), as well as map symbols that represent non-presence points,
 e.g. locally extinct populations (open circle) and fossil records
 (crosses). These have been manually removed from the maps in the
-database. Please refer to the description in Arnell et al. XXXb and the
-file HultenMetadata.csv in the database (Arnell et al. XXXa) for
+database. Please refer to the description in Arnell et al. 2026a and the
+file HultenMetadata.csv in the database (Arnell et al. 2026b) for
 information on manual editing as well as updated scientific
 nomenclature.  
 <br>
@@ -248,7 +248,7 @@ per species.
 <br> There are two main types of symbols representing a species’ range
 in the original maps. Hatched areas representing areas where the species
 is common to less common and dots representing isolated finds (Figure 3
-in Arnell et al. XXXb). Given the scale of the original maps, the size
+in Arnell et al. 2026a). Given the scale of the original maps, the size
 of the dots representing isolated finds is approximately 16 km on the
 ground. This means that if we overlap the digitized and cleaned range
 maps (polygon features) with the 10×10 km Swedish National grid one
@@ -390,11 +390,13 @@ fixFileNames(path, pattern = "*.geojson")
 
 ## References
 
-Arnell, M., Auffret, A., & Hylander, K. (2025). Historical distribution
-maps of vascular plants in northwestern Europe (Version 1) Data set.
-Stockholm University. DOI: Available after publication.
+Arnell, M., Auffret, A., & Hylander, K. (2026a) Historical distribution
+maps of vascular plants in northwestern Europe. Ecology. DOI: available
+after publication.
 
-Arnell et al. (XXXb)
+Arnell, M., Auffret, A., & Hylander, K. (2026b). Historical distribution
+maps of vascular plants in northwestern Europe (Version 1) Data set.
+Stockholm University. DOI: <https://doi.org/10.58141/y1x5-cx68>.
 
 Hultén, E. (1971). Atlas of the distribution of vascular plants in
 northwestern Europe (2nd ed.). Generalstabens Litografiska Anstalts
